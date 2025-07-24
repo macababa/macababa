@@ -24,7 +24,15 @@ export default function Timer() {
     setIsActive(false);
   };
 
-  const toggleTimer = () => setIsActive(!isActive);
+  const toggleTimer = () => {
+    if (!isActive) {
+      const now = new Date().getTime();
+      const targetTime = now + time * 1000;
+      localStorage.setItem("timerData", JSON.stringify({ targetTime }));
+    }
+    setIsActive(!isActive);
+  };
+  
   const resetTimer = () => {
     setTime(inputTime);
     setIsActive(false);
