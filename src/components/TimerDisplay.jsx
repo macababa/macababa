@@ -8,8 +8,10 @@ function TimerDisplay() {
     const stored = localStorage.getItem("timerData");
     if (stored) {
       try {
-        const { targetTime } = JSON.parse(stored);
-        setTargetTime(Number(targetTime));
+        const { targetTime: newTarget } = JSON.parse(stored);
+        if (Number(newTarget) !== targetTime) {
+          setTargetTime(Number(newTarget));
+        }
       } catch (e) {
         console.error("Hatalı timerData:", stored);
       }
@@ -19,6 +21,7 @@ function TimerDisplay() {
   useEffect(() => {
     updateTimerFromStorage();
 
+    // storage event dinleyici (diğer sekmeden başlatma için)
     const handleStorageChange = (e) => {
       if (e.key === "timerData") {
         updateTimerFromStorage();
@@ -27,17 +30,10 @@ function TimerDisplay() {
 
     window.addEventListener("storage", handleStorageChange);
 
+    // embed sayfa targetTime değişmiş mi diye sürekli kontrol eder
     const syncInterval = setInterval(() => {
-      const stored = localStorage.getItem("timerData");
-      if (stored) {
-        try {
-          const { targetTime: newTarget } = JSON.parse(stored);
-          if (Number(newTarget) !== targetTime) {
-            setTargetTime(Number(newTarget));
-          }
-        } catch (e) {}
-      }
-    }, 2000);
+      updateTimerFromStorage();
+    }, 1000);
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
